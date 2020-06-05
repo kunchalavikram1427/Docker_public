@@ -1,0 +1,110 @@
+---------------
+Basic commands
+---------------
+
+docker info
+docker version
+docker system df
+docker
+docker --help
+
+
+------------
+containers
+------------
+
+docker container run --publish 80:80 nginx
+docker container run --publish 80:80 --detach nginx
+docker container run --publish 80:80 - d nginx
+docker container attach nginx (reattach the container to terminal/std_output)
+docker ps -> Lists all running containers only
+docker ps -a -> Lists all containers(running & exited) with unique random names. 
+docker run centos:7 -> runs centos
+docker rmi <image_name> -> Removes an image
+docker container run --publish 80:80 --name webhost nginx -> creates a container with name as
+webhost
+docker run -p HOST_PORT:CONTAINER_PORT -e ENV_VAR=VALUE IMAGE 
+docker run -d -p 3306:3306 --name db -e MYSQL_RANDOM_ROOT_PASSWORD=yes mysql
+docker container stop <unique container id> -> stops container
+docker start < unique container id> -> start a stopped container
+docker container kill <unique container id> -> force kill a non-responding container
+docker container logs <container name> -> displays logs in static mode
+docker container logs -f <container name> -> displays logs in follow/live mode
+docker container rm <container 1> <container 2>…. -> remove docker containers; doesn’t remove running containers
+docker container rm -f <container 1> -> Force remove running containers
+docker container rm -f $(docker ps -a -q) -> Removes all containers; -q is quiet mode that displays only numeric IDs of containers
+
+docker commit <container-id> <new-image-name> -> save changes made to a containee to a image
+
+docker top <container> -> Lists specific processes in a specific container
+docker container inspect <container> -> gives the config and meta data used to start this container; returns JSON array
+docker container stats <container> -> gives live info on CPU, Mem usage, I/O of the container
+
+-----------------
+docker networks
+-----------------
+docker network ls
+docker network inspect bridge
+docker network create --driver bridge my_net
+docker container run -d --name new_nginx --network my_app_net nginx
+
+
+-----------
+dockerfile
+-----------
+
+docker build  -t flaskapp .
+docker run -d --name flask -p 80:5000 flaskapp
+ocker build -t test -f DockerfileTest .
+
+----------------
+docker-swarm
+----------------
+docker service create \
+  --name=viz \
+  --publish=8080:8080/tcp \
+  --constraint=node.role==manager \
+  --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+  dockersamples/visualizer
+
+docker swarm init --advertise-addr MANAGER_IP
+docker swarm join-token manager
+docker node ls
+docker service create --replicas 5 -p 80:80 --name <service_name> <image_name>
+docker service create --replicas 5 -p 80:80 --name web nginx
+
+docker service ls
+docker service ps <service-name>
+docker node ps
+docker node ps <node-name>
+docker node inspect self or master1 or worker1
+
+docker service scale <service_name>=8
+docker service rm <service_name>
+docker service update --force <service_name>
+docker service update --image nginx:1.14.0 –replicas 15 <service_name>
+docker service update --image <new_image> --update-parallelism 2 --update-delay 10s <service_name>
+docker service update --rollback <service_name>
+
+docker node update --availability drain Manager-1
+docker node update --availability active Manager-1
+
+docker swarm leave
+
+
+-----------------
+overlay networks
+-----------------
+docker network create -d overlay my_overlay
+docker service create --name psql --network my_overlay -e POSTGRES_PASSWORD=pass postgres
+docker service create --name drupal --network my_overlay -p 80:80 drupal
+
+
+--------------------
+docker stack deploy
+--------------------
+docker stack deploy -c <docker-compose.yml>  <stack-name>
+docker stack ls
+docker stack ps <stack-name>
+docker service ls
+docker stack rm <stack-name>
